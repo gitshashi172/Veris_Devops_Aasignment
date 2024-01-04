@@ -1,0 +1,76 @@
+(5)To achieve serverless deployment of a simple "Hello World" Lambda function with an attached API Gateway using the Serverless Framework in Node.js. 
+steps:
+
+Prerequisites:
+->Install Node.js and npm.
+->Install Serverless Framework globally: "npm install -g serverless".
+
+Steps:
+1.Create the Lambda function:Create a folder for your project and navigate to it in your terminal.
+mkdir hello-world-lambda
+cd hello-world-lambda
+
+Create a new Serverless project:
+serverless create --template aws-nodejs --path hello-world
+cd hello-world
+
+Replace the content of handler.js with the following code:
+// handler.js
+'use strict';
+
+module.exports.hello = async (event) => {
+  return {
+    statusCode: 200,
+    body: JSON.stringify({
+      message: 'Hello World!',
+      input: event,
+    }),
+  };
+};
+
+2. Configure Serverless for deployment:
+Create a serverless.yml file with the following configuration:
+# serverless.yml
+service: hello-world
+
+provider:
+  name: aws
+  runtime: nodejs14.x
+  stage: dev
+  region: ${opt:region, 'us-east-1'}  # Default region is us-east-1
+
+functions:
+  hello:
+    handler: handler.hello
+    events:
+      - http:
+          path: hello
+          method: get
+          cors: true
+
+3. Deploy the Lambda function and API Gateway:
+You can use the following script to deploy this Lambda function on any region in AWS using the Serverless Framework:
+#!/bin/bash
+
+# Deploy the Lambda function and API Gateway
+serverless deploy --region $1
+
+# Fetch the API Gateway URL
+API_GATEWAY_URL=$(serverless info --verbose --region $1 | grep "ServiceEndpoint" | awk '{print $2}')
+
+echo "API Gateway URL: $API_GATEWAY_URL/hello"
+
+# Invoke the Lambda function using the API Gateway
+curl "$API_GATEWAY_URL/hello"
+
+Save this script as deploy.sh and give it execute permissions:
+chmod +x deploy.sh
+
+You can then run the script with the desired region as an argument:
+./deploy.sh us-west-2
+
+
+Replace `us-west-2` with any AWS region where you want to deploy the Lambda function.
+This script will deploy the Lambda function and API Gateway, retrieve the API Gateway URL, and invoke the function using a curl command, displaying the response.
+This basic setup deploys a "Hello World" Lambda function and provides a way to automate its deployment to different AWS regions using the Serverless Framework.
+Adjustments can be made for a more complex use case.

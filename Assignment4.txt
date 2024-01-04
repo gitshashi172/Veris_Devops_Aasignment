@@ -1,0 +1,48 @@
+(4)Create a script using Node.js to perform following activities.
+• List AWS services being used region wise.
+• List each service in detail, like EC2, RDS etc.
+Installed the aws-sdk package via npm (npm install aws-sdk) and configured your AWS credentials properly (either through environment variables or AWS 
+credentials file).
+
+const AWS = require('aws-sdk');
+
+async function listAWSServices(region) {
+  console.log(`Services in region: ${region}`);
+  const ec2 = new AWS.EC2({ region });
+  
+  // Describe all regions
+  const regionsData = await ec2.describeRegions().promise();
+  const regions = regionsData.Regions.map((r) => r.RegionName);
+  
+  for (const reg of regions) {
+    console.log(`\nRegion: ${reg}`);
+    const session = new AWS.Session({ region: reg });
+    const services = session.config.apiVersions;
+    
+    console.log('Available Services:');
+    console.log(services);
+    
+    console.log('\nService Details:');
+    for (const service of Object.keys(services)) {
+      const client = new AWS[service]({ region: reg });
+      try {
+        const data = await client.describeInstances().promise();
+        // Adjust the above method ('describeInstances') based on the service to retrieve specific details
+        // For RDS: 'describeDBInstances', For S3: 'listBuckets', etc.
+        console.log(`${service} Details:`);
+        console.log(data);
+      } catch (error) {
+        console.error(`Error retrieving details for ${service}:`, error);
+      }
+    }
+  }_
+}
+
+// Replace 'your_region' with the desired region (e.g., 'us-east-1', 'us-west-2', etc.)
+listAWSServices('your_region');
+
+This script uses the AWS SDK for Node.js to list AWS services available in a specified region and provides some basic details for each service. Adjust the `describe*` 
+methods based on the service to retrieve specific details. For example, `describe_Instances` for EC2, `describe_DB_Instances` for RDS, etc.
+Replace 'your_region' with the desired AWS region code before executing the script.
+
+

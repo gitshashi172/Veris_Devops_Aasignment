@@ -1,0 +1,60 @@
+(2)
+- name: Configure and Secure Web Server
+  hosts: your_server
+  become: yes
+  vars:
+    webserver: apache # Change to 'nginx' if using Nginx
+
+  tasks:
+    - name: Pick a Linux AMI (This step depends on your setup)
+      # Include task to launch an instance with your preferred AMI
+
+    - name: Install webserver
+      yum:
+        name: "{{ webserver }}"
+        state: present
+      when: webserver == 'apache'
+      
+    - name: Install webserver
+      package:
+        name: "{{ webserver }}"
+        state: present
+      when: webserver == 'nginx'
+
+    - name: Download code from git
+      git:
+        repo: https://github.com/your_repo.git
+        dest: /var/www/html/your_site
+
+    - name: Configure webserver with security best practices
+      # Add tasks to configure webserver according to security best practices
+      # For Apache: You might want to adjust file permissions, disable directory listing, enable HTTPS, etc.
+      # For Nginx: You might want to adjust configuration to disable unnecessary modules, implement SSL/TLS, etc.
+
+    - name: Create a self-signed certificate
+      command: openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout /etc/ssl/private/self-signed.key -out /etc/ssl/certs/self-signed.crt
+      notify: Restart {{ webserver }}
+
+    - name: Secure a demo site using self-signed certificate
+      # Add tasks to configure your webserver to use the self-signed certificate
+      # For Apache: Update virtual host configuration to use the SSL certificate
+      # For Nginx: Update server block configuration to use SSL certificate
+
+  handlers:
+    - name: Restart Apache
+      service:
+        name: httpd
+        state: restarted
+      when: webserver == 'apache'
+
+    - name: Restart Nginx
+      service:
+        name: nginx
+        state: restarted
+      when: webserver == 'nginx'
+
+
+(a)You have a predefined AMI selection process that's not covered in the playbook.
+(b)You'll need to add specific configuration tasks for your chosen web server (Apache or Nginx) according to security best practices.
+(c)For SSL/TLS setup and site security, additional configurations for your chosen web server are necessary, such as modifying virtual host/server
+  block configurations and enabling HTTPS.

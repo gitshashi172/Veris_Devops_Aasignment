@@ -1,0 +1,36 @@
+(3)Requires several steps involving Packer, Ansible, AWS ASG, ELB/ALB, IAM roles, and S3 access. I can provide
+a high-level overview of the workflow and the components involved:
+
+1.Packer & Ansible:-
+->Use Packer to create a custom AMI by executing the Ansible playbook you've previously defined.
+->Packer will provision a new EC2 instance based on the specified AMI, run Ansible to configure it, and then create a new AMI.
+
+Packer Job: Define a Packer template that includes the Ansible playbook execution. This template will create the custom AMI.
+
+2.AWS Auto Scaling Group (ASG) and ELB/ALB:-
+->Create an Auto Scaling Group using the created AMI.
+->Set up Elastic Load Balancer (ELB) or Application Load Balancer (ALB) and configure it to forward traffic to instances in the ASG.
+
+Auto Scaling Group and Load Balancer Setup:
+->Use AWS CloudFormation or Terraform to define the Auto Scaling Group and ELB/ALB configurations.
+->Specify the launch configuration or template with the custom AMI created by Packer.
+->Configure health checks, scaling policies, etc.
+
+3.ALB Domain Route Policy:-
+->Showcase ALB's capabilities by creating different domain-based routing policies.
+->This involves setting up listeners and rules based on the incoming hostnames/domains and routing them to specific target groups or instances.
+
+ALB Domain Route Policy:
+->Set up listeners and rules on the ALB based on incoming domain names.
+->Define target groups and associate them with different routing rules.
+
+4.IAM Role with S3 Access:-
+->Create an IAM role with policies attached that grant access to the specific S3 bucket.
+->Attach this IAM role to the instances launched within the ASG so they can access the S3 bucket.
+
+IAM Role with S3 Access:
+->Create an IAM role with policies allowing access to the specific S3 bucket.
+->Attach this role to the instances in the Auto Scaling Group.
+
+Each step will involve detailed configurations and potentially several AWS services working together. Using infrastructure-as-code tools like AWS CloudFormation or 
+Terraform will greatly assist in automating and managing these resources in a more organized manner.
